@@ -339,7 +339,6 @@ package_python-rapidocr() {
 
 package_rapidocr-fonts() {
 	pkgdesc="Fonts for RapidOCR text visualization"
-	arch=('any')
 
 	local dest_dir="${pkgdir}/usr/share/rapidocr/fonts/"
 	install -Dm644 "${srcdir}/FZYTK.TTF" "${dest_dir}/FZYTK.TTF"
