@@ -1,42 +1,481 @@
-# Maintainer: Barnabé di Kartola <barnabedikartola@gmail.com>
-
-pkgname=biglinux-package-template
-pkgdesc="Package template for biglinux"
-# depends=('')
-# makedepends=('')
-# conflicts=('')
-pkgver=$(date +%y.%m.%d)
-pkgrel=$(date +%H%M)
+pkgbase=python-rapidocr
+pkgname=('python-rapidocr'
+	'rapidocr-fonts'
+	'rapidocr-models-mobile-base'
+	'rapidocr-models-server'
+	'rapidocr-models-mobile-english'
+	'rapidocr-models-mobile-arabic'
+	'rapidocr-models-mobile-cyrillic'
+	'rapidocr-models-mobile-devanagari'
+	'rapidocr-models-mobile-greek'
+	'rapidocr-models-mobile-slavic'
+	'rapidocr-models-mobile-korean'
+	'rapidocr-models-mobile-latin'
+	'rapidocr-models-mobile-tamil'
+	'rapidocr-models-mobile-telugu'
+	'rapidocr-models-mobile-thai')
+pkgver=3.6.0
+pkgrel=1
+pkgdesc='Cross-runtime OCR library: A wrapper for RapidOCR with multiple language support'
 arch=('any')
-license=('GPL3')
-url="https://github.com/biglinux/$pkgname"
-provides=("$pkgname")
-source=("git+${url}.git")
-md5sums=('SKIP')
-if [ -e "${pkgname}.install" ];then
-    install=${pkgname}.install
-elif [ -e "pkgbuild.install" ];then
-    install=pkgbuild.install
-fi
+license=('Apache-2.0')
+makedepends=('python-build' 'python-installer' 'python-setuptools')
+url='https://github.com/RapidAI/RapidOCR'
 
-package() {
-    # Verify default folder
-    if [ -d "${srcdir}/${pkgname}/${pkgname}" ]; then
-        InternalDir="${srcdir}/${pkgname}/${pkgname}"
-    else
-        InternalDir="${srcdir}/${pkgname}"
-    fi
+# URLs for external resources
+_modelscope_url="https://www.modelscope.cn/models/RapidAI/RapidOCR/resolve/master/onnx"
+_dictscope_url="https://www.modelscope.cn/models/RapidAI/RapidOCR/resolve/v3.6.0/paddle/PP-OCRv5/rec"
 
-    # Copy files
-    if [ -d "${InternalDir}/usr" ]; then
-        cp -r "${InternalDir}/usr" "${pkgdir}/"
-    fi
+source=(
+	"https://github.com/RapidAI/RapidOCR/archive/v${pkgver}.tar.gz"
+	"https://github.com/RapidAI/RapidOCR/releases/download/v1.1.0/required_for_whl_v3.0.0.zip"
+	"https://www.modelscope.cn/models/RapidAI/RapidOCR/resolve/v3.4.0/resources/fonts/FZYTK.TTF"
 
-    if [ -d "${InternalDir}/etc" ]; then
-        cp -r "${InternalDir}/etc" "${pkgdir}/"
-    fi
+	# --- Mobile Base Models (Chinese/English/General) ---
+	"ch_PP-OCRv5_mobile_det.onnx::${_modelscope_url}/PP-OCRv5/det/ch_PP-OCRv5_mobile_det.onnx"
+	"ch_ppocr_mobile_v2.0_cls_infer.onnx::${_modelscope_url}/PP-OCRv4/cls/ch_ppocr_mobile_v2.0_cls_infer.onnx"
+	"ch_PP-OCRv5_rec_mobile_infer.onnx::${_modelscope_url}/PP-OCRv5/rec/ch_PP-OCRv5_rec_mobile_infer.onnx"
+	"en_PP-OCRv5_rec_mobile_infer.onnx::${_modelscope_url}/PP-OCRv5/rec/en_PP-OCRv5_rec_mobile_infer.onnx"
 
-    if [ -d "${InternalDir}/opt" ]; then
-        cp -r "${InternalDir}/opt" "${pkgdir}/"
-    fi
+	# --- Server Models (Higher Accuracy) ---
+	"ch_PP-OCRv5_server_det.onnx::${_modelscope_url}/PP-OCRv5/det/ch_PP-OCRv5_server_det.onnx"
+	"ch_PP-OCRv5_rec_server_infer.onnx::${_modelscope_url}/PP-OCRv5/rec/ch_PP-OCRv5_rec_server_infer.onnx"
+
+	# --- Multilingual Mobile Models ---
+	"arabic_PP-OCRv5_rec_mobile_infer.onnx::${_modelscope_url}/PP-OCRv5/rec/arabic_PP-OCRv5_rec_mobile_infer.onnx"
+	"cyrillic_PP-OCRv5_rec_mobile_infer.onnx::${_modelscope_url}/PP-OCRv5/rec/cyrillic_PP-OCRv5_rec_mobile_infer.onnx"
+	"devanagari_PP-OCRv5_rec_mobile_infer.onnx::${_modelscope_url}/PP-OCRv5/rec/devanagari_PP-OCRv5_rec_mobile_infer.onnx"
+	"el_PP-OCRv5_rec_mobile_infer.onnx::${_modelscope_url}/PP-OCRv5/rec/el_PP-OCRv5_rec_mobile_infer.onnx"
+	"eslav_PP-OCRv5_rec_mobile_infer.onnx::${_modelscope_url}/PP-OCRv5/rec/eslav_PP-OCRv5_rec_mobile_infer.onnx"
+	"korean_PP-OCRv5_rec_mobile_infer.onnx::${_modelscope_url}/PP-OCRv5/rec/korean_PP-OCRv5_rec_mobile_infer.onnx"
+	"latin_PP-OCRv5_rec_mobile_infer.onnx::${_modelscope_url}/PP-OCRv5/rec/latin_PP-OCRv5_rec_mobile_infer.onnx"
+	"ta_PP-OCRv5_rec_mobile_infer.onnx::${_modelscope_url}/PP-OCRv5/rec/ta_PP-OCRv5_rec_mobile_infer.onnx"
+	"te_PP-OCRv5_rec_mobile_infer.onnx::${_modelscope_url}/PP-OCRv5/rec/te_PP-OCRv5_rec_mobile_infer.onnx"
+	"th_PP-OCRv5_rec_mobile_infer.onnx::${_modelscope_url}/PP-OCRv5/rec/th_PP-OCRv5_rec_mobile_infer.onnx"
+
+	# --- Dictionary Files (PP-OCRv5) ---
+	"ppocrv5_dict.txt::${_dictscope_url}/ch_PP-OCRv5_rec_mobile_infer/ppocrv5_dict.txt"
+	"ppocrv5_en_dict.txt::${_dictscope_url}/en_PP-OCRv5_rec_mobile_infer/ppocrv5_en_dict.txt"
+	"ppocrv5_arabic_dict.txt::${_dictscope_url}/arabic_PP-OCRv5_rec_mobile_infer/ppocrv5_arabic_dict.txt"
+	"ppocrv5_cyrillic_dict.txt::${_dictscope_url}/cyrillic_PP-OCRv5_rec_mobile_infer/ppocrv5_cyrillic_dict.txt"
+	"ppocrv5_devanagari_dict.txt::${_dictscope_url}/devanagari_PP-OCRv5_rec_mobile_infer/ppocrv5_devanagari_dict.txt"
+	"ppocrv5_el_dict.txt::${_dictscope_url}/el_PP-OCRv5_rec_mobile_infer/ppocrv5_el_dict.txt"
+	"ppocrv5_eslav_dict.txt::${_dictscope_url}/eslav_PP-OCRv5_rec_mobile_infer/ppocrv5_eslav_dict.txt"
+	"ppocrv5_korean_dict.txt::${_dictscope_url}/korean_PP-OCRv5_rec_mobile_infer/ppocrv5_korean_dict.txt"
+	"ppocrv5_latin_dict.txt::${_dictscope_url}/latin_PP-OCRv5_rec_mobile_infer/ppocrv5_latin_dict.txt"
+	"ppocrv5_ta_dict.txt::${_dictscope_url}/ta_PP-OCRv5_rec_mobile_infer/ppocrv5_ta_dict.txt"
+	"ppocrv5_te_dict.txt::${_dictscope_url}/te_PP-OCRv5_rec_mobile_infer/ppocrv5_te_dict.txt"
+	"ppocrv5_th_dict.txt::${_dictscope_url}/th_PP-OCRv5_rec_mobile_infer/ppocrv5_th_dict.txt"
+
+	# --- Font Files (from resources/fonts/) ---
+	"https://www.modelscope.cn/models/RapidAI/RapidOCR/resolve/v3.6.0/resources/fonts/arabic.ttf"
+	"https://www.modelscope.cn/models/RapidAI/RapidOCR/resolve/v3.6.0/resources/fonts/cyrillic.ttf"
+	"https://www.modelscope.cn/models/RapidAI/RapidOCR/resolve/v3.6.0/resources/fonts/devanagari.ttf"
+	"https://www.modelscope.cn/models/RapidAI/RapidOCR/resolve/v3.6.0/resources/fonts/el.ttf"
+	"https://www.modelscope.cn/models/RapidAI/RapidOCR/resolve/v3.6.0/resources/fonts/korean.ttf"
+	"https://www.modelscope.cn/models/RapidAI/RapidOCR/resolve/v3.6.0/resources/fonts/latin.ttf"
+	"https://www.modelscope.cn/models/RapidAI/RapidOCR/resolve/v3.6.0/resources/fonts/tamil.ttf"
+	"https://www.modelscope.cn/models/RapidAI/RapidOCR/resolve/v3.6.0/resources/fonts/telugu.ttf"
+	"https://www.modelscope.cn/models/RapidAI/RapidOCR/resolve/v3.6.0/resources/fonts/th.ttf"
+)
+
+sha256sums=('8b061f87053e37e1943c0f372fffa2a6a52f064018ee69cceaeb32e8143ff782'
+            'e050aa8cf29cdbea04550204336859069dcbf7bb86761112d2008ae93db13296'
+            '4065a23df6823c8e2b69a0e76d02f02a6470b8774a5e91086609701ad95cc33f'
+            '4d97c44a20d30a81aad087d6a396b08f786c4635742afc391f6621f5c6ae78ae'
+            'e47acedf663230f8863ff1ab0e64dd2d82b838fceb5957146dab185a89d6215c'
+            '5825fc7ebf84ae7a412be049820b4d86d77620f204a041697b0494669b1742c5'
+            'c3461add59bb4323ecba96a492ab75e06dda42467c9e3d0c18db5d1d21924be8'
+            '0f8846b1d4bba223a2a2f9d9b44022fbc22cc019051a602b41a7fda9667e4cad'
+            'e09385400eaaaef34ceff54aeb7c4f0f1fe014c27fa8b9905d4709b65746562a'
+            'c1192e632d0baa9146ae5b756a0e635e3dc63c1733737ebfd1629e87144e9295'
+            '90f761b4bfcce0c8c561c0cb5c887b0971d3ec01c32164bdf7374a35b0982711'
+            'd6f0a906580e3fa6b324a318718f1f31f268b6ea8ef985f91c2012a37f52c91e'
+            'b4368bccd557123c702b7549fee6cd1e94b581337d1c9b65310f109131542b7f'
+            '08705d6721849b1347d26187f15a5e362c431963a2a62bfff4feac578c489aab'
+            'cd6e2ea50f6943ca7271eb8c56a877a5a90720b7047fe9c41a2e541a25773c9b'
+            'b20bd37c168a570f583afbc8cd7925603890efbcdc000a59e22c269d160b5f5a'
+            'a42448808b7dea87597336f12438935f40353f1949e8360acd9e06b4da21bfe1'
+            'a3690451b50028a09a3316a1274f7c05728151ea3f8fd392696397a7fefcbd92'
+            'de541dd83161c241ff426f7ecfd602a0ba77d686cf3ab9a6c255ea82fd08006e'
+            'd1979e9f794c464c0d2e0b70a7fe14dd978e9dc644c0e71f14158cdf8342af1b'
+            'e025a66d31f327ba0c232e03f407ae8d105e1e709e7ccb3f408aa778c24e70d6'
+            '7f92f7dbb9b75a4787a83bfb4f6d14a8ab515525130c9d40a9036f61cf6999e9'
+            'db40aa52ceb112055be80c694afdf655d5d2c4f7873704524cc16a447ca913ba'
+            '09c7440bfc5477e5c41052304b6b185aff8c4a5e8b2b4c23c1c706f6fe1ee9fc'
+            '31defc62c0c3ad3674a82da6192226a2ba98ef4ff014a7045cb88d59f9c3de31'
+            '3e95f1581557162870cacdba5af91a4c6be2890710d395b0c3c7578e7ee5e6eb'
+            'a88071c68c01707489baa79ebe0405b7beb5cca229f4fc94cc3ef992328802d7'
+            '3c0a8a79b612653c25f765271714f71281e4e955962c153e272b7b8c1d2b13ff'
+            '85b541352ae18dc6ba6d47152d8bf8adff6b0266e605d2eef2990c1bf466117b'
+            '42f83f5d3fdb50778e4fa5b66c58d99a59ab7792151c5e74f34b8ffd7b61c9d6'
+            '57f5406f94bb6688fb7077f7be65f08bbd71cecf48c01ea26c522cb5c4836b7a'
+            'e38162048fca91187a7c3d73a4a1109ca0490d6bac8acf3ff32a57f5fff7e5b6'
+            '85180753fa255615b5f5b436c00b203567fb87a271a5af9dd095d43a429c53eb'
+            '385e78e6359a9d88a0f243d53b1209d7548361ba2194e2b9ec779bcaa7e8949d'
+            '892e6c81071fc85923f8d0ff925edab6049dd4495a2fdedffddc04753bf348b3'
+            '0897316bdb2e308cea2841c54940f2ef5707856000aa07910c8bff39a47e40bd'
+            '1562fe5cbdaacab4a5880d6404ba05245d12f3a4478fe16021e976bc725ce5d5'
+            'b771ac413157f6b1f1a52fb8ff1b56057f4b492fcce385ddd32ca12eee0c73b0'
+            '7f82ab141b77d263f9ea9b31b47faf50c11310f42fce6d9dffeaaa334909bbf9'
+            'b8150084e25734e6f31696c57ff009f5564efa09d295848b717d9e2328c0311d')
+
+prepare() {
+	cd "${srcdir}/RapidOCR-${pkgver}/python"
+
+	# --- Step 1: Patch `setup.py` ---
+	# The original setup.py attempts to dynamically fetch the version from PyPI or git tags,
+	# which fails in an offline/isolated build environment.
+	# We patch it to set the version explicitly to ${pkgver} and remove the dynamic fetcher.
+	python -c "
+import sys
+lines = open('setup.py').read().splitlines()
+new_lines = []
+skip_block = False
+for line in lines:
+    if 'get_pypi_latest_version' in line:
+        continue
+    if line.startswith('obtainer ='):
+        new_lines.append(f\"VERSION_NUM = '${pkgver}'\")
+        continue
+    
+    # Skip the entire try/except block for obtainer
+    if line.strip().startswith('try:'):
+        skip_block = True
+        continue
+    if skip_block:
+        if line.strip().startswith('except') or line.strip().startswith('latest_version ='):
+            continue
+        # If we hit the line after the block (which is VERSION_NUM line usually, or sys.argv check)
+        # But wait, VERSION_NUM line uses obtainer too, so we skip it based on 'obtainer' check below
+        if not line.startswith(' ') and not line.startswith('except') and not line.startswith('try'):
+             skip_block = False
+             
+    if 'obtainer' in line or 'latest_version' in line:
+        continue
+
+    # Remove sys.argv parsing block that used obtainer
+    # Also remove the truncation causing build failure
+    if 'sys.argv' in line:
+        if '>' in line or 'matched' in line or '[:2]' in line:
+            continue
+    if 'match_str' in line or 'matched_versions' in line:
+        continue
+        
+    new_lines.append(line)
+
+with open('setup.py', 'w') as f:
+    f.write('\n'.join(new_lines))
+"
+
+	# --- Step 2: Clean and Reorganize ---
+	# Remove any pre-existing models to ensure we only package what we explicitly include.
+	rm -rf rapidocr/models/*
+
+	# Create a temporary directory structure to reorganize the package
+	mkdir -p rapidocr_t
+	mv rapidocr{,_t/}
+	mv -T rapidocr{_t,}
+	cd rapidocr
+
+	# Create the package init file
+	echo "from .rapidocr.main import RapidOCR, VisRes" >__init__.py
+
+	if [[ -e rapidocr/rapidocr ]]; then
+		rm -r rapidocr/rapidocr/
+	fi
+
+	# --- Step 3: Patch `default_models.yaml` ---
+	# Update the default model paths to point to system/share directories instead of relative paths.
+	# This ensures the library finds the models in /usr/share/rapidocr/models/.
+	find . -name "default_models.yaml" -print0 | while IFS= read -r -d '' file; do
+		python -c "
+import yaml
+import os
+
+# Mapping of file names to their absolute paths in the installed system
+model_path_map = {
+    'ch_PP-OCRv5_mobile_det.onnx': '/usr/share/rapidocr/models/ch_PP-OCRv5_mobile_det.onnx',
+    'ch_ppocr_mobile_v2.0_cls_infer.onnx': '/usr/share/rapidocr/models/ch_ppocr_mobile_v2.0_cls_infer.onnx',
+    'ch_PP-OCRv5_rec_mobile_infer.onnx': '/usr/share/rapidocr/models/ch_PP-OCRv5_rec_mobile_infer.onnx',
+    'en_PP-OCRv5_rec_mobile_infer.onnx': '/usr/share/rapidocr/models/en_PP-OCRv5_rec_mobile_infer.onnx',
+    'ch_PP-OCRv5_server_det.onnx': '/usr/share/rapidocr/models/ch_PP-OCRv5_server_det.onnx',
+    'ch_PP-OCRv5_rec_server_infer.onnx': '/usr/share/rapidocr/models/ch_PP-OCRv5_rec_server_infer.onnx',
+    'arabic_PP-OCRv5_rec_mobile_infer.onnx': '/usr/share/rapidocr/models/arabic_PP-OCRv5_rec_mobile_infer.onnx',
+    'cyrillic_PP-OCRv5_rec_mobile_infer.onnx': '/usr/share/rapidocr/models/cyrillic_PP-OCRv5_rec_mobile_infer.onnx',
+    'devanagari_PP-OCRv5_rec_mobile_infer.onnx': '/usr/share/rapidocr/models/devanagari_PP-OCRv5_rec_mobile_infer.onnx',
+    'el_PP-OCRv5_rec_mobile_infer.onnx': '/usr/share/rapidocr/models/el_PP-OCRv5_rec_mobile_infer.onnx',
+    'eslav_PP-OCRv5_rec_mobile_infer.onnx': '/usr/share/rapidocr/models/eslav_PP-OCRv5_rec_mobile_infer.onnx',
+    'korean_PP-OCRv5_rec_mobile_infer.onnx': '/usr/share/rapidocr/models/korean_PP-OCRv5_rec_mobile_infer.onnx',
+    'latin_PP-OCRv5_rec_mobile_infer.onnx': '/usr/share/rapidocr/models/latin_PP-OCRv5_rec_mobile_infer.onnx',
+    'ta_PP-OCRv5_rec_mobile_infer.onnx': '/usr/share/rapidocr/models/ta_PP-OCRv5_rec_mobile_infer.onnx',
+    'te_PP-OCRv5_rec_mobile_infer.onnx': '/usr/share/rapidocr/models/te_PP-OCRv5_rec_mobile_infer.onnx',
+    'th_PP-OCRv5_rec_mobile_infer.onnx': '/usr/share/rapidocr/models/th_PP-OCRv5_rec_mobile_infer.onnx',
+}
+
+def update_model_dir(data):
+    if isinstance(data, dict):
+        for k, v in data.items():
+            if k == 'model_dir' and isinstance(v, str):
+                filename = os.path.basename(v)
+                # Handle possible URL basename mismatch or cleanup
+                if filename in model_path_map:
+                    data[k] = model_path_map[filename]
+                # Also check keys in map directly if v just ends with it
+                else:
+                    for map_key, map_val in model_path_map.items():
+                        if v.endswith(map_key):
+                            data[k] = map_val
+                            break
+            else:
+                update_model_dir(v)
+    elif isinstance(data, list):
+        for item in data:
+            update_model_dir(item)
+
+config_path = '$file'
+with open(config_path, 'r') as f:
+    config = yaml.safe_load(f)
+
+update_model_dir(config)
+
+with open(config_path, 'w') as f:
+    yaml.dump(config, f)
+"
+	done
+
+	# --- Step 4: Patch `config.yaml` ---
+	# Update the core configuration to use explicit paths.
+	# This prevents the application from trying to download models at runtime.
+	find . -name "config.yaml" -print0 | while IFS= read -r -d '' file; do
+		echo "DEBUG: Patching config file with explicit model paths: $file"
+		python -c "
+import yaml
+config_path = '$file'
+with open(config_path, 'r') as f:
+    config = yaml.safe_load(f)
+
+# Set versions to PP-OCRv5 to match our installed models
+config['Det']['ocr_version'] = 'PP-OCRv5'
+config['Rec']['ocr_version'] = 'PP-OCRv5'
+
+# Set explicit model paths to prevent any download attempts
+model_dir = '/usr/share/rapidocr/models/'
+config['Det']['model_path'] = model_dir + 'ch_PP-OCRv5_mobile_det.onnx'
+config['Cls']['model_path'] = model_dir + 'ch_ppocr_mobile_v2.0_cls_infer.onnx'
+config['Rec']['model_path'] = model_dir + 'ch_PP-OCRv5_rec_mobile_infer.onnx'
+
+# Set dict/keys path for recognition
+config['Rec']['rec_keys_path'] = model_dir + 'ppocrv5_dict.txt'
+
+# Set font path for visualization (from rapidocr-fonts package)
+config['Global']['font_path'] = '/usr/share/rapidocr/fonts/FZYTK.TTF'
+
+with open(config_path, 'w') as f:
+    yaml.dump(config, f)
+"
+	done
+
+	# --- Step 5: Fix CLI Argument Bug ---
+	# Patch main.py to fix an upstream bug where --lang_type argument is ignored/not passed correctly.
+	find . -name "main.py" -path "*rapidocr*" -print0 | while IFS= read -r -d '' file; do
+		echo "DEBUG: Patching main.py CLI bug: $file"
+		sed -i 's/"Global.return_word_box": args.return_word_box,/"Global.return_word_box": args.return_word_box,\n        "Rec.lang_type": LangRec(args.lang_type),/' "$file"
+	done
+}
+
+build() {
+	cd "${srcdir}/RapidOCR-${pkgver}/python"
+	python -m build --wheel --no-isolation
+}
+
+# --- Helper Function to Install Models ---
+_install_model() {
+	local src_file="$1"
+	local dest_dir="${pkgdir}/usr/share/rapidocr/models/"
+	install -Dm644 "${srcdir}/${src_file}" "${dest_dir}/${src_file}"
+}
+
+# --- Package Definitions ---
+
+package_python-rapidocr() {
+	depends=(
+		'python>=3.6'
+		'python-pyclipper>=1.2.0'
+		'python-opencv>=4.5.1.48'
+		'python-numpy>=1.19.5' 'python-numpy<3.0.0'
+		'python-six>=1.15.0'
+		'python-shapely>=1.7.1'
+		'python-yaml'
+		'python-pillow'
+		'python-tqdm'
+		'python-omegaconf'
+		'python-requests'
+		'python-colorlog'
+		'rapidocr-models-mobile-base' # Base model dependency
+	)
+	optdepends=(
+		'python-openvino: Recommended runtime'
+		'python-onnxruntime: Supported runtime'
+		'python-onnxruntime-cpu: Faster than GPU-accelerated onnxruntime'
+		'python-paddlepaddle: Supported runtime'
+		'python-pytorch: Supported runtime'
+		'rapidocr-models-server: Server models for higher accuracy'
+	)
+
+	cd "${srcdir}/RapidOCR-${pkgver}/python"
+	python -m installer --destdir="$pkgdir" dist/*.whl
+
+	# Symlink the models directory from site-packages to /usr/share/rapidocr/models
+	local site_packages=$(python -c 'import sys; print(".".join(map(str, sys.version_info[:2])))')
+	local rapidocr_dir="${pkgdir}/usr/lib/python${site_packages}/site-packages/rapidocr"
+
+	# Remove the empty models dir created during install
+	rm -rf "${rapidocr_dir}/models"
+
+	# Create the symlink
+	ln -s /usr/share/rapidocr/models "${rapidocr_dir}/models"
+}
+
+package_rapidocr-fonts() {
+	pkgdesc="Fonts for RapidOCR text visualization"
+	arch=('any')
+
+	local dest_dir="${pkgdir}/usr/share/rapidocr/fonts/"
+	install -Dm644 "${srcdir}/FZYTK.TTF" "${dest_dir}/FZYTK.TTF"
+}
+
+package_rapidocr-models-mobile-base() {
+	pkgdesc="Mobile models (v5) for RapidOCR (Base: Simplified Chinese, Chinese Pinyin, Traditional Chinese, English, Japanese, Detection, Classification)"
+	depends=('rapidocr-fonts')
+	provides=('rapidocr-models')
+
+	_install_model "ch_PP-OCRv5_mobile_det.onnx"
+	_install_model "ch_ppocr_mobile_v2.0_cls_infer.onnx"
+	_install_model "ch_PP-OCRv5_rec_mobile_infer.onnx"
+
+	# Install main dictionary file
+	local dest_dir="${pkgdir}/usr/share/rapidocr/models/"
+	install -Dm644 "${srcdir}/ppocrv5_dict.txt" "${dest_dir}/ppocrv5_dict.txt"
+	install -Dm644 "${srcdir}/required_for_whl_v3.0.0/resources/models/ppocr_keys_v1.txt" "${dest_dir}/ppocr_keys_v1.txt"
+}
+
+package_rapidocr-models-server() {
+	pkgdesc="Server models (v5) for RapidOCR (Higher accuracy, larger size)"
+	depends=()
+	provides=('rapidocr-models')
+
+	_install_model "ch_PP-OCRv5_server_det.onnx"
+	_install_model "ch_PP-OCRv5_rec_server_infer.onnx"
+
+	# Dictionary file (same as base)
+	local dest_dir="${pkgdir}/usr/share/rapidocr/models/"
+	install -Dm644 "${srcdir}/ppocrv5_dict.txt" "${dest_dir}/ppocrv5_dict.txt"
+}
+
+package_rapidocr-models-mobile-english() {
+	pkgdesc="English mobile model (v5) for RapidOCR (Optimized for English, higher accuracy/adaptability)"
+	depends=('rapidocr-fonts')
+	_install_model "en_PP-OCRv5_rec_mobile_infer.onnx"
+	local dest_dir="${pkgdir}/usr/share/rapidocr/models/"
+	install -Dm644 "${srcdir}/ppocrv5_en_dict.txt" "${dest_dir}/ppocrv5_en_dict.txt"
+}
+
+package_rapidocr-models-mobile-arabic() {
+	pkgdesc="Arabic mobile model (v5) for RapidOCR (Arabic, Persian, Uyghur, Urdu, Pashto, Kurdish, Sindhi, Balochi, English)"
+	depends=('rapidocr-fonts')
+	_install_model "arabic_PP-OCRv5_rec_mobile_infer.onnx"
+	local dest_dir="${pkgdir}/usr/share/rapidocr/models/"
+	local font_dir="${pkgdir}/usr/share/rapidocr/fonts/"
+	install -Dm644 "${srcdir}/ppocrv5_arabic_dict.txt" "${dest_dir}/ppocrv5_arabic_dict.txt"
+	install -Dm644 "${srcdir}/arabic.ttf" "${font_dir}/arabic.ttf"
+}
+
+package_rapidocr-models-mobile-cyrillic() {
+	pkgdesc="Cyrillic mobile model (v5) for RapidOCR (Russian, Belarusian, Ukrainian, Serbian (Cyrillic), Bulgarian, Mongolian, Abkhazian, Adyghe, Kabardian, Avar, Dargin, Ingush, Chechen, Lak, Lezgin, Tabasaran, Kazakh, Kyrgyz, Tajik, Macedonian, Tatar, Chuvash, Bashkir, Malian, Moldovan, Udmurt, Komi, Ossetian, Buryat, Kalmyk, Tuvan, Sakha, Karakalpak, English)"
+	depends=('rapidocr-fonts')
+	_install_model "cyrillic_PP-OCRv5_rec_mobile_infer.onnx"
+	local dest_dir="${pkgdir}/usr/share/rapidocr/models/"
+	local font_dir="${pkgdir}/usr/share/rapidocr/fonts/"
+	install -Dm644 "${srcdir}/ppocrv5_cyrillic_dict.txt" "${dest_dir}/ppocrv5_cyrillic_dict.txt"
+	install -Dm644 "${srcdir}/cyrillic.ttf" "${font_dir}/cyrillic.ttf"
+}
+
+package_rapidocr-models-mobile-devanagari() {
+	pkgdesc="Devanagari mobile model (v5) for RapidOCR (Hindi, Marathi, Nepali, Bihari, Maithili, Angika, Bhojpuri, Magahi, Santali, Newari, Konkani, Sanskrit, Haryanvi, English)"
+	depends=('rapidocr-fonts')
+	_install_model "devanagari_PP-OCRv5_rec_mobile_infer.onnx"
+	local dest_dir="${pkgdir}/usr/share/rapidocr/models/"
+	local font_dir="${pkgdir}/usr/share/rapidocr/fonts/"
+	install -Dm644 "${srcdir}/ppocrv5_devanagari_dict.txt" "${dest_dir}/ppocrv5_devanagari_dict.txt"
+	install -Dm644 "${srcdir}/devanagari.ttf" "${font_dir}/devanagari.ttf"
+}
+
+package_rapidocr-models-mobile-greek() {
+	pkgdesc="Greek mobile model (v5) for RapidOCR (Greek, English)"
+	depends=('rapidocr-fonts')
+	_install_model "el_PP-OCRv5_rec_mobile_infer.onnx"
+	local dest_dir="${pkgdir}/usr/share/rapidocr/models/"
+	local font_dir="${pkgdir}/usr/share/rapidocr/fonts/"
+	install -Dm644 "${srcdir}/ppocrv5_el_dict.txt" "${dest_dir}/ppocrv5_el_dict.txt"
+	install -Dm644 "${srcdir}/el.ttf" "${font_dir}/el.ttf"
+}
+
+package_rapidocr-models-mobile-slavic() {
+	pkgdesc="East Slavic mobile model (v5) for RapidOCR (Russian, Belarusian, Ukrainian, English)"
+	depends=('rapidocr-fonts')
+	_install_model "eslav_PP-OCRv5_rec_mobile_infer.onnx"
+	local dest_dir="${pkgdir}/usr/share/rapidocr/models/"
+	install -Dm644 "${srcdir}/ppocrv5_eslav_dict.txt" "${dest_dir}/ppocrv5_eslav_dict.txt"
+	# East Slavic uses cyrillic.ttf (from cyrillic package if installed, or FZYTK.TTF fallback)
+}
+
+package_rapidocr-models-mobile-korean() {
+	pkgdesc="Korean mobile model (v5) for RapidOCR (Korean, English)"
+	depends=('rapidocr-fonts')
+	_install_model "korean_PP-OCRv5_rec_mobile_infer.onnx"
+	local dest_dir="${pkgdir}/usr/share/rapidocr/models/"
+	local font_dir="${pkgdir}/usr/share/rapidocr/fonts/"
+	install -Dm644 "${srcdir}/ppocrv5_korean_dict.txt" "${dest_dir}/ppocrv5_korean_dict.txt"
+	install -Dm644 "${srcdir}/korean.ttf" "${font_dir}/korean.ttf"
+}
+
+package_rapidocr-models-mobile-latin() {
+	pkgdesc="Latin mobile model (v5) for RapidOCR (French, German, Afrikaans, Italian, Spanish, Bosnian, Portuguese, Czech, Welsh, Danish, Estonian, Irish, Croatian, Uzbek, Hungarian, Serbian (Latin), Indonesian, Occitan, Icelandic, Lithuanian, Maori, Malay, Dutch, Norwegian, Polish, Slovak, Slovenian, Albanian, Swedish, Swahili, Tagalog, Turkish, Latin, Azerbaijani, Kurdish, Latvian, Maltese, Pali, Romanian, Vietnamese, Finnish, Basque, Galician, Luxembourgish, Romansh, Catalan, Quechua)"
+	depends=('rapidocr-fonts')
+	_install_model "latin_PP-OCRv5_rec_mobile_infer.onnx"
+	local dest_dir="${pkgdir}/usr/share/rapidocr/models/"
+	local font_dir="${pkgdir}/usr/share/rapidocr/fonts/"
+	install -Dm644 "${srcdir}/ppocrv5_latin_dict.txt" "${dest_dir}/ppocrv5_latin_dict.txt"
+	install -Dm644 "${srcdir}/latin.ttf" "${font_dir}/latin.ttf"
+}
+
+package_rapidocr-models-mobile-tamil() {
+	pkgdesc="Tamil mobile model (v5) for RapidOCR (Tamil, English)"
+	depends=('rapidocr-fonts')
+	_install_model "ta_PP-OCRv5_rec_mobile_infer.onnx"
+	local dest_dir="${pkgdir}/usr/share/rapidocr/models/"
+	local font_dir="${pkgdir}/usr/share/rapidocr/fonts/"
+	install -Dm644 "${srcdir}/ppocrv5_ta_dict.txt" "${dest_dir}/ppocrv5_ta_dict.txt"
+	install -Dm644 "${srcdir}/tamil.ttf" "${font_dir}/tamil.ttf"
+}
+
+package_rapidocr-models-mobile-telugu() {
+	pkgdesc="Telugu mobile model (v5) for RapidOCR (Telugu, English)"
+	depends=('rapidocr-fonts')
+	_install_model "te_PP-OCRv5_rec_mobile_infer.onnx"
+	local dest_dir="${pkgdir}/usr/share/rapidocr/models/"
+	local font_dir="${pkgdir}/usr/share/rapidocr/fonts/"
+	install -Dm644 "${srcdir}/ppocrv5_te_dict.txt" "${dest_dir}/ppocrv5_te_dict.txt"
+	install -Dm644 "${srcdir}/telugu.ttf" "${font_dir}/telugu.ttf"
+}
+
+package_rapidocr-models-mobile-thai() {
+	pkgdesc="Thai mobile model (v5) for RapidOCR (Thai, English)"
+	depends=('python-rapidocr' 'rapidocr-fonts')
+	_install_model "th_PP-OCRv5_rec_mobile_infer.onnx"
+	local dest_dir="${pkgdir}/usr/share/rapidocr/models/"
+	local font_dir="${pkgdir}/usr/share/rapidocr/fonts/"
+	install -Dm644 "${srcdir}/ppocrv5_th_dict.txt" "${dest_dir}/ppocrv5_th_dict.txt"
+	install -Dm644 "${srcdir}/th.ttf" "${font_dir}/th.ttf"
 }
