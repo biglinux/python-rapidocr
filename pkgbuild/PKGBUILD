@@ -19,7 +19,7 @@ pkgrel=1
 pkgdesc='Cross-runtime OCR library: A wrapper for RapidOCR with multiple language support'
 arch=('any')
 license=('Apache-2.0')
-makedepends=('python-build' 'python-installer' 'python-setuptools')
+makedepends=('python-build' 'python-installer' 'python-setuptools' 'python-yaml')
 url='https://github.com/RapidAI/RapidOCR'
 
 # URLs for external resources
