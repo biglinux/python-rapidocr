@@ -300,12 +300,12 @@ _install_model() {
 
 package_python-rapidocr() {
 	depends=(
-		'python>=3.6'
-		'python-pyclipper>=1.2.0'
-		'python-opencv>=4.5.1.48'
-		'python-numpy>=1.19.5' 'python-numpy<3.0.0'
-		'python-six>=1.15.0'
-		'python-shapely>=1.7.1'
+		'python'
+		'python-pyclipper'
+		'python-opencv'
+		'python-numpy'
+		'python-six'
+		'python-shapely'
 		'python-yaml'
 		'python-pillow'
 		'python-tqdm'
